@@ -1,0 +1,13 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/css/example.css" />
+</head>
+<body>
+<ul>
+    <li>Boom: {{boom}}</li><!-- Set by routes/example-routes.js's GET / route -->
+    <li>ENV: {{env}}</li><!-- Set by view-extensions/example-ext.js -->
+    <li>PID: {{pid}}</li><!-- Set by view-extensions/example-ext.js -->
+    <li>doSomething: {{ boom|doSomething(1) }}</li><!-- Custom filter defined by view-extensions/example-ext.js -->
+</ul>
+</body>
+</html>

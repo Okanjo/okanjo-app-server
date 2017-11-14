@@ -1,0 +1,5 @@
+{% extends "layouts/master.j2" %}
+
+{% block content %}
+hello world {{ boom }} {{ env }} {{ pid }} {{ boom|doSomething(1) }}
+{% endblock %}
