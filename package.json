@@ -1,7 +1,7 @@
 {
   "name": "okanjo-app-server",
   "version": "1.0.0",
-  "description": "API server framework using HAPI and friends",
+  "description": "Server framework using HAPI and friends",
   "main": "OkanjoServer.js",
   "scripts": {
     "clean": "rm -rf .nyc_output coverage",
