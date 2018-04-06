@@ -1,8 +1,26 @@
 language: node_js
 node_js:
-  - "lts/*"
-  - "6"
+- lts/*
+- '6'
 script:
-  - npm run report
+- npm run report
 after_script:
-  - "npm install coveralls@2.10.0 && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
+- npm install coveralls@2.10.0 && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls
+before_deploy:
+- mkdir ./deploy && cp ./README.md ./deploy
+deploy:
+  provider: s3
+  access_key_id:
+    secure: 4pfY0D0MZThMJ7A99HX/rx2FufZXG9h5zjD8jXQrTAcoCTX+uQmoC/ZiSUGPoosJxWf8heIE+0sEZxbl1VkQNwFkeW1EV7iaZMoCTNccP1q3ZLfZ99wzGYIrr4oORIvmbs3HBUY69UI/grbkaFgMuCIZ5Ud8n5tSV7k9dBn1smMMStVU2fCnyy+W8y8Poja46vxvzWzeWrkPzlwYlEL8EKzg284r3ntGrZsp+YDFpSnAULWAjFj3WvasL7sSMu6bEylqwhMaxOIaL1G5l0BV+ZFHHQh1N+M1Kcq7f2zJgL91DCDS/iy0DISVBdqZTeMIY5AsBWqXRZEqD5vYSaG0NIfc3/ApSNKKu7LU/Rfto/sfJ8QeLDFNcxQoywJF3N+NRZ18GZ/pqh0sv2XnWGMUlxdcZh9Ey6KoQZJRxPeNcuTHeL/sAMkLqhBEa1VctlQUEukO9EiY5AmSv2Pnwrh+VCrGVyr0lNKl2Oh61g5FMB3u4On+LOdoNw/kz1+du2WBPMGJap8cwq0jRY4D+CdjTYa5gSzexiLqB0uTQudWfQ9ybFiOqHulapDScO0YvGaIRbE7sWWZ12a3vk31OVhBXbxXGKB0hQIFO5U/lybVyDTrrZ2QQ8Cp2+Qp1C4Ex4jqmQUJp7vJj3xtcpa7PO9ouL0ladlVSCPIE1SJrgnwFOc=
+  secret_access_key:
+    secure: PRJYRk1ixfrU+XAQPK3AqQwg8ofJ5eiHV5r70MMlGEyEIJ4pdCFNKnr6TqN6RY4JJXZt0KNWUvU5yJwNUF/aSnKkVQaMFlTwwheMkop6knxUBWl6/pQv3lfte2qPb1BxEqU8Gbk5JM970w8KRNPjbIqMrDvWn389kWGjF3DgB/Rh+jr5l325UDYinVQ4FCXx9gtVNOLx5XfpiLvTFOc6wD0QXyPynbUgnkJfAIhj5CAb2H7AXGU7b21Fq2kHhOcRnQra4khIVga7anexkSaksCoGrtllJeqzD/MTRHVYskBQQpjaN8l4wbehJDHo6qq0K5hbk5J58yywif66F3bUeZy/bGyyURzvDJ2yvOXtixFHzCyQhcyA36UJ1jzJE5JfJu2l1ULz7mW5rdkC0wS8I0CF395TCyrMFA/6HqBEI5VDcRwFB0wQiNPdxmUdI+fhxnRIXbIq9sAtQ/g65kWEZyzkOHuhB8uk0da35UXYThuIUYEshBHC8u7M+s8Fi5i+kQjS6qcEUETOv5rmLOZ7i8QxdRkvPflxuDPtybM546XBx13EWvSJcfcVSDo3h0nsP1K9JoMwTldncXumylMVt7DzlJ9SvpOil1dRi4AdkaYvCBCrOPQesJLKZs2DF07KdIVohsBPnKPtFXZxBK6FtKbFCxJkrrN6gLA5O2+D2sA=
+  bucket: okanjo-docs
+  skip_cleanup: true
+  upload-dir: okanjo-app-server
+  acl: public_read
+  detect_encoding: true
+  default_text_charset: utf-8
+  local_dir: deploy
+  on:
+    branch: master
+    repo: Okanjo/okanjo-app-server
