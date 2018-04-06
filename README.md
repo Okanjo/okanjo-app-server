@@ -51,7 +51,7 @@ Your directory structure might look like this:
   
 You can find these example files here: [docs/example-app](https://github.com/okanjo/okanjo-app-server/tree/master/docs/example-app)
   
-####config.js:
+#### config.js:
 ```js
 "use strict";
 const Path = require('path');
@@ -98,7 +98,7 @@ module.exports = {
 ```
 This `config.js` includes all available options. You may exclude or comment-out the ones that do not apply to your application.
 
-####index.js:
+#### index.js:
 ```js
 "use strict";
 const OkanjoApp = require('okanjo-app');
@@ -131,7 +131,7 @@ const server = new OkanjoServer(app, app.config.webServer, (err) => {
 You can make this much more elaborate by starting the server in a worker using okanjo-app-broker so you can hot-reload the entire server on changes, etc.
 
 
-####routes/example-routes.js
+#### routes/example-routes.js
 A route file needs to export a function. The context of the function (`this`) will be the OkanjoServer instance.
 
 Route files are loaded synchronously, so no async operations should be performed.
@@ -190,7 +190,7 @@ module.exports = function() {
 };
 ```
 
-####view-extensions/example-ext.js
+#### view-extensions/example-ext.js
 A Nunjucks extension file needs to export a function. The context of the function (`this`) will be the OkanjoServer instance.
 
 Nunjucks extension files are loaded synchronously, so no async operations should be performed.
@@ -220,7 +220,7 @@ module.exports = function(env) {
 ```
 
 
-####views/example.j2
+#### views/example.j2
 Views are standard Nunjucks templates. For example:
 
 ```html
@@ -281,6 +281,7 @@ Creates a new server instance.
 * `config` – (optional, object) The web server configuration, see [config.js](#config.js)
 * `options` – (optional, object) Server options object
   * `options.extensions` – Array of functions to call when initializing. Useful for initializing async hapi plugins or custom configurations.
+* `callback(err)` – (optional) Function to fire when initialization has completed
   
 For example:
 
