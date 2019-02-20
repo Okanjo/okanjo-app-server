@@ -357,7 +357,7 @@ class OkanjoServer {
      * @private
      */
     _registerShutdownHandler() {
-        this.__sigtermHandler = this.stop.bind(this);
+        this.__sigtermHandler = (/*signal*/) => { this.stop(); };
 
         process.once('SIGTERM', this.__sigtermHandler);
         process.once('SIGINT', this.__sigtermHandler);

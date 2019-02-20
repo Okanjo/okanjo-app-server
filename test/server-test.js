@@ -45,7 +45,6 @@ describe('OkanjoServer', function () {
         }).should.throw(/^Derp/);
     });
 
-
     it('should handle initialization with no config and no callback', function (done) {
 
         const app = new OkanjoApp({}),
@@ -66,7 +65,6 @@ describe('OkanjoServer', function () {
 
         }, 10);
     });
-
 
     it('should be able to start and stop with no config', function (done) {
 
@@ -111,7 +109,6 @@ describe('OkanjoServer', function () {
 
     });
 
-
     it('should be able to stop without a callback', function (done) {
 
         const app = new OkanjoApp({}),
@@ -153,6 +150,47 @@ describe('OkanjoServer', function () {
 
     });
 
+    it('should be able to stop via process signals', function (done) {
+
+        const app = new OkanjoApp({}),
+            server = new OkanjoServer(app, function (err) {
+                should(err).be.exactly(null);
+
+                isPortInUse(3000, function (err, inUse) {
+                    should(err).not.be.ok();
+                    should(inUse).be.exactly(false);
+
+                    server.start(function (err) {
+                        should(err).not.be.ok();
+
+                        isPortInUse(3000, function (err, inUse) {
+                            should(err).not.be.ok();
+                            should(inUse).be.exactly(true);
+
+                            // Faking a process signal here, cuz we don't really wanna shutdown tests
+                            server.__sigtermHandler('SIGTERM');
+
+                            setTimeout(function () {
+
+                                isPortInUse(3000, function (err, inUse) {
+                                    should(err).not.be.ok();
+                                    should(inUse).be.exactly(false);
+
+                                    done();
+                                });
+                            }, 19);
+
+                        });
+                    });
+                });
+            });
+
+        server.should.be.ok();
+        server.should.be.instanceof(OkanjoServer);
+        server.config.should.be.an.Object();
+        server.config.port.should.be.exactly(3000);
+
+    });
 
     it('should be start with given port', function (done) {
 
@@ -195,7 +233,6 @@ describe('OkanjoServer', function () {
         server.config.port.should.be.exactly(6666);
 
     });
-
 
     it('should start socket.io when configured', function (done) {
 
@@ -272,7 +309,6 @@ describe('OkanjoServer', function () {
 
     });
 
-
     it('should explode when view handler enabled but has no path', function (done) {
 
         const app = new OkanjoApp({
@@ -287,7 +323,6 @@ describe('OkanjoServer', function () {
 
     });
 
-
     it('should init view handler when configured to do so', function (done) {
 
         const app = new OkanjoApp({
@@ -301,7 +336,6 @@ describe('OkanjoServer', function () {
             done();
         });
     });
-
 
     it('should explode when nunjucks extensions path is crap', function (done) {
 
@@ -321,7 +355,6 @@ describe('OkanjoServer', function () {
 
     });
 
-
     it('should autoload nunjucks extensions when configured to do so', function (done) {
 
         const app = new OkanjoApp({
@@ -337,7 +370,6 @@ describe('OkanjoServer', function () {
         });
     });
 
-
     it('should init when static handler enabled but has no path', function (done) {
         const app = new OkanjoApp({
                 webServer: {
@@ -349,7 +381,6 @@ describe('OkanjoServer', function () {
             done();
         });
     });
-
 
     it('should init static handler when configured to do so', function (done) {
 
@@ -364,7 +395,6 @@ describe('OkanjoServer', function () {
             done();
         });
     });
-
 
     it('should init static npm modules when configured to do so', function (done) {
 
@@ -382,7 +412,6 @@ describe('OkanjoServer', function () {
             done();
         });
     });
-
 
     it('should handle edge cases with npm modules', function (done) {
 
@@ -442,7 +471,6 @@ describe('OkanjoServer', function () {
         ], done);
     });
 
-
     it('should init static paths when configured to do so', function (done) {
 
         const app = new OkanjoApp({
@@ -460,7 +488,6 @@ describe('OkanjoServer', function () {
         });
     });
 
-
     it('should init static paths without a trailing slash', function (done) {
 
         const app = new OkanjoApp({
@@ -476,7 +503,6 @@ describe('OkanjoServer', function () {
             done();
         });
     });
-
 
     it('should handle edge cases with static paths', function (done) {
 
@@ -531,7 +557,6 @@ describe('OkanjoServer', function () {
 
         ], done);
     });
-
 
     it('should load routes when configured to do so', function (done) {
         const app = new OkanjoApp({
@@ -600,7 +625,6 @@ describe('OkanjoServer', function () {
         });
     });
 
-
     it('should explode when routes path is crap', function (done) {
 
         const app = new OkanjoApp({
@@ -616,7 +640,6 @@ describe('OkanjoServer', function () {
             });
 
     });
-
 
     it('should serve static assets properly', function(done) {
 
@@ -723,7 +746,6 @@ describe('OkanjoServer', function () {
                 });
             });
     });
-
 
     it('should provide a directory listing if configured to do so', function(done) {
 
@@ -844,7 +866,6 @@ describe('OkanjoServer', function () {
                 });
             });
     });
-
 
     it('should report 500 errors', function(done) {
 
