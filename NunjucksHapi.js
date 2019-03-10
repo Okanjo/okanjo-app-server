@@ -1,10 +1,13 @@
-const Nunjucks = require('nunjucks'),
-    _defaults = require('lodash.defaults');
+"use strict";
 
-let wrapper = {}, viewPath, env;
+const Nunjucks = require('nunjucks');
+const _defaults = require('lodash.defaults');
 
-// This compile has the signature that hapi is expecting
-wrapper.compile = function (template, options, callback) {
+let wrapper = {};
+let env;
+
+// This compile has the signature that vision is expecting
+wrapper.compile = function (src, options, callback) {
 
     // Get if compile mode is async by checking if the callback is defined
     const asyncCompileMode = (typeof callback === 'function');
@@ -12,7 +15,7 @@ wrapper.compile = function (template, options, callback) {
     // We get the full template string from Hapi and pass it to Nunjucks
     // Nunjucks will pull in any includes and blocks itself
 
-    const t = Nunjucks.compile(template, env);
+    const t = Nunjucks.compile(src, env);
 
     /* istanbul ignore if */
     if (asyncCompileMode) {
@@ -27,8 +30,7 @@ wrapper.compile = function (template, options, callback) {
     } else {
 
         // Render the template in the synchronous way
-        //noinspection JSUnusedLocalSymbols
-        return function (context, options) {
+        return function (context/*, options*/) {
             return t.render(context);
         };
     }
@@ -38,10 +40,7 @@ wrapper.compile = function (template, options, callback) {
 // We need our compiler to know about the env so we keep a reference to it
 
 wrapper.configure = function (path, options) {
-
-    viewPath = path;
     env = Nunjucks.configure(path, options);
-
     return env;
 };
 

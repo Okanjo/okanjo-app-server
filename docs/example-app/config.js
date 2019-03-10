@@ -4,8 +4,10 @@ const Path = require('path');
 module.exports = {
     webServer: {
 
-        // Listening port
-        port: 3000, // Port to listen on, default: 3000
+        // https://hapijs.com/api#server()
+        hapiServerOptions: {
+            // port: 3000 // leave unset to let the OS take the wheel
+        },
 
         // Graceful shutdown handling
         drainTime: 5000, // how long to wait to drain connections before killing the socket, in milliseconds, default: 5000
@@ -13,9 +15,6 @@ module.exports = {
         // Route configuration
         routePath: Path.join(__dirname, 'routes'), // where to find route files, default: undefined
 
-        // Hapi server / global settings
-        hapiServerOptions: undefined, // HAPI server settings, see: http://hapijs.com/api#new-serveroptions (default: undefined)
-        hapiConnectionOptions: undefined, // HAPI global connection settings, see: http://hapijs.com/api#serverconnectionoptions (default: undefined)
 
         // Socket.io configuration
         webSocketEnabled: true, // Whether to enable socket.io server, default: false

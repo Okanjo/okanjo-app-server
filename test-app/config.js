@@ -3,8 +3,10 @@ const path = require('path');
 module.exports = {
     webServer: {
 
-        hapiServerOptions: undefined, // http://hapijs.com/api#new-serveroptions
-        hapiConnectionOptions: undefined, // http://hapijs.com/api#serverconnectionoptions
+        // https://hapijs.com/api#server()
+        hapiServerOptions: {
+            // port: 3000 // leave unset to let the OS take the wheel
+        },
 
         // Route options
         routePath: path.join(__dirname, 'routes'), // √

@@ -1,11 +1,10 @@
 /**
  * @this OkanjoServer
- * @param callback
  */
-module.exports = function(callback) {
+module.exports = async function() {
 
     // Fudge JSONP responses to always come back 200, cuz browsers eat them otherwise #OMNOMNOMNOM
-    this.hapi.ext('onPreResponse', (request, reply) => {
+    this.hapi.ext('onPreResponse', (request, h) => {
 
         // If this is a JSONP request, fudge the HTTP status code but preserve it in the body of the response
         if (request.jsonp) {
@@ -28,9 +27,7 @@ module.exports = function(callback) {
             }
         }
 
-        return reply.continue();
-
+        return h.continue;
     });
 
-    callback();
 };

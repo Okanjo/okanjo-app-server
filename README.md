@@ -30,7 +30,9 @@ Add to your project like so:
 npm install okanjo-app-server
 ```
 
-Note: requires the [`okanjo-app`](https://github.com/okanjo/okanjo-app) module.
+> Note: requires the [`okanjo-app`](https://github.com/okanjo/okanjo-app) module.
+
+> Note: v2 and on uses Hapi v18+. Use v1 for Hapi 16
 
 ## Example Usage
 
@@ -58,19 +60,18 @@ const Path = require('path');
 
 module.exports = {
     webServer: {
-        
-        // Listening port
-        port: 3000, // Port to listen on, default: 3000
-        
+
+        // Hapi server / global settings
+        hapiServerOptions: {
+            // Listening port
+            port: 3000, // Port to listen on, default: null (os assigned)
+        }, // HAPI server settings, see: // https://hapijs.com/api#server()
+                
         // Graceful shutdown handling
         drainTime: 5000, // how long to wait to drain connections before killing the socket, in milliseconds, default: 5000
         
         // Route configuration
         routePath: Path.join(__dirname, 'routes'), // where to find route files, default: undefined
-
-        // Hapi server / global settings
-        hapiServerOptions: undefined, // HAPI server settings, see: http://hapijs.com/api#new-serveroptions (default: undefined)
-        hapiConnectionOptions: undefined, // HAPI global connection settings, see: http://hapijs.com/api#serverconnectionoptions (default: undefined)
 
         // Socket.io configuration
         webSocketEnabled: true, // Whether to enable socket.io server, default: false
@@ -109,23 +110,22 @@ const config = require('./config.js');
 const app = new OkanjoApp(config);
 
 // Configure the server
-const server = new OkanjoServer(app, app.config.webServer, (err) => {
-    if (err) {
-        console.error('Something failed to initialize: ', err);
+const server = new OkanjoServer(app, app.config.webServer);
+
+// Start it up
+(async () => {
+    await server.init(); // optional, if you wish to do your own setup before starting HAPI
+    await server.start();
+})()
+    .then(() => {
+        console.log('Server started at:', server.hapi.info.uri);
+        console.log('Use Control-C to quit')
+    })
+    .catch((err) => {
+        console.error('Something went horribly wrong', err);
         process.exit(1);
-    } else {
-        // Start the server
-        server.start((err) => {
-            if (err) {
-                console.error('Server failed to start', err);
-                process.exit(2);
-            } else {
-                console.log('Server started at:', server.hapi.info.uri);
-                console.log('Use control-C to quit')
-            }
-        });
-    }
-});
+    })
+;
 ```
 
 You can make this much more elaborate by starting the server in a worker using okanjo-app-broker so you can hot-reload the entire server on changes, etc.
@@ -143,15 +143,13 @@ Route files are loaded synchronously, so no async operations should be performed
  * @this OkanjoServer
  */
 module.exports = function() {
-    
-    // Remember, this.app is available here :)
 
     // This route replies with a rendered view using the example.j2 template and given context
     this.hapi.route({
         method: 'GET',
         path: '/',
-        handler: function (request, reply) {
-            reply.view('example.j2', {
+        handler: (request, h) => {
+            return h.view('example.j2', {
                 boom: "roasted"
             });
         },
@@ -159,34 +157,31 @@ module.exports = function() {
             // ... validation, authentication. tagging, etc
         }
     });
-    
+
     // This route replies with an api response
     this.hapi.route({
         method: 'GET',
         path: '/api/sometimes/works',
-        handler: function (request, reply) {
-            pretendServiceFunction((err, res) => {          // Fire off a pretend service function
-                this.app.ifOk(err, reply, () => {           // If the function failed, reply negatively
-                    reply(this.app.response.ok(), res);     // Otherwise, since everything was good, reply positively 
-                }); 
-            });
+        handler: async (request, h) => {
+            const res = await pretendServiceFunction();     // Fire off a pretend service function
+            return this.app.response.ok(res);                    // Return the response
         },
         config: {
             // ... validation, authentication. tagging, etc
         }
     });
-    
+
     /**
-     * Pretend service function that can callback with a response or an error
+     * Pretend service function that returns a payload or throws an error
      */
-    const pretendServiceFunction = (callback) => {
-        if (Math.random() > 0.50) { // half the time, return an error
-            callback(this.app.response.badRequest('Nope, not ready yet.'));
+    const pretendServiceFunction = async () => {
+        if (Math.random() >= 0.50) { // half the time, return an error
+            throw this.app.response.badRequest('Nope, not ready yet.');
         } else {
-            callback(null, { all: 'good' });
+            return { all: 'good' };
         }
     };
-    
+
 };
 ```
 
@@ -270,6 +265,7 @@ Server class. Must be instantiated to be used.
 ## Properties
 * `server.app` – (read-only) The OkanjoApp instance provided when constructed
 * `server.config` – (read-only)  The configuration provided when constructed
+* `server.options` – (read-only)  The options provided when constructed
 * `server.hapi` – (read-only) The HAPI instance created when initialized.
 * `server.io` – (read-only) The socket.io instance created when initialized.
 
@@ -278,10 +274,9 @@ Server class. Must be instantiated to be used.
 ### `new OkanjoServer(app, [config, [options]], [callback])`
 Creates a new server instance.
 * `app` – The OkanjoApp instance to bind to
-* `config` – (optional, object) The web server configuration, see [config.js](#config.js)
+* `config` – (optional, object) The OkanjoServer configuration, see [config.js](#config.js)
 * `options` – (optional, object) Server options object
   * `options.extensions` – Array of functions to call when initializing. Useful for initializing async hapi plugins or custom configurations.
-* `callback(err)` – (optional) Function to fire when initialization has completed
   
 For example:
 
@@ -294,41 +289,32 @@ new OkanjoServer(app, config, {
         OkanjoServer.extensions.responseErrorReporter,  // reports 
         
         // Register a hapi extension, for example, query string parsing (like the old days)
-        function giveMeQueryStringsBack(callback) {
-            this.hapi.register({
-                register: require('hapi-qs'),
+        async function giveMeQueryStringsBack() {
+            await this.hapi.register({
+                plugin: require('hapi-qs'),
                 options: {}
-            }, (err) => {
-                if (err) this.app.report('Failed to register query string module!');
-                callback(err);
             });
         },
         
         // Register authentication strategies, etc
-        function registerAuthenticationStrategies(callback) {
+        async function registerAuthenticationStrategies() {
 
-            // Register the plugin
-            const plugin = require('hapi-auth-basic-key'); // plugin to use HTTP basic auth username as an api key
-            this.hapi.register(plugin, (err) => {
-                if (err) {
-                    this.app.report('Failed to load ' + plugin.register.attributes.name, err);
-                    return callback(err);
+            // plugin to use HTTP basic auth username as an api key
+            await this.hapi.register({
+                plugin: require('hapi-auth-basic-key'),
+                options: {}
+            });
+                
+            // Register the strategy
+            this.hapi.auth.strategy('key-only', 'basic', {
+                validateFunc: (req, key, secret, authCallback) => {
+                    // FIXME - put your real key authentication here (e.g. db or redis lookup)
+                    let valid = key === 'my-secret-key';
+                    let err = null;
+                    
+                    // Pass back validity and credentials if valid
+                    authCallback(err, valid, { key });
                 }
-                
-                // Register the strategy
-                this.hapi.auth.strategy('key-only', 'basic', {
-                    validateFunc: (req, key, secret, authCallback) => {
-                        // FIXME - put your real key authentication here (e.g. db or redis lookup)
-                        let valid = key === 'my-secret-key';
-                        let err = null;
-                        
-                        // Pass back validity and credentials if valid
-                        authCallback(err, valid, { key });
-                    }
-                });
-                
-                // Done configuring this plugin
-                callback();
             });
         }
         
@@ -338,11 +324,15 @@ new OkanjoServer(app, config, {
 });
 ```
 
-### `server.start(callback)`
+### `await server.init()`
+Configures the underlying services, such as HAPI, Socket.io, etc. Called automatically by `server.start`, if not done manually. Before v2, this was done in the constructor. 
+* `callback(err)` – Function to fire once the server has started. If `err` is present, something went wrong.
+
+### `await server.start()`
 Starts the server instance. 
 * `callback(err)` – Function to fire once the server has started. If `err` is present, something went wrong.
  
-### `server.stop(callback)`
+### `await server.stop()`
 Attempts to gracefully shutdown the server instance. If `config.drainTime` elapses, the socket will be forcibly killed.
 * `callback(err)` – Function to fire once the server has stopped. If `err` is present, something went wrong.
 

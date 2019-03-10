@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * @this OkanjoServer
  */
@@ -7,14 +9,11 @@ module.exports = function() {
     this.hapi.route({
         method: 'GET',
         path: '/deep',
-        handler: function (request, reply) {
-
-            reply("deeeep");
-
+        handler: function (/*request, h*/) {
+            return "deeeep";
         },
         config: {
         }
     });
-
 
 };

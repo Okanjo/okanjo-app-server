@@ -1,11 +1,10 @@
 /**
  * @this OkanjoServer
- * @param callback
  */
-module.exports = function(callback) {
+module.exports = async function() {
 
     // Anytime the server returns a 500-level response, tell us about it. We should never return a 500 because something went horribly wrong.
-    this.hapi.ext('onPreResponse', (request, reply) => {
+    this.hapi.ext('onPreResponse', (request, h) => {
 
         // If the response is a legit response object and the status code is something we screwed up, report it
         if (request.response.isBoom) {
@@ -30,9 +29,8 @@ module.exports = function(callback) {
             }
         }
 
-        return reply.continue();
+        return h.continue;
 
     });
 
-    callback();
 };
