@@ -3,4 +3,7 @@ test
 coverage
 .nyc_output
 .idea
+.eslint*
+.travis*
 docs
+test-app
