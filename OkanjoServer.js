@@ -273,8 +273,10 @@ class OkanjoServer {
      * @private
      */
     _unregisterShutdownHandler() {
-        process.removeListener('SIGTERM', this.__sigtermHandler);
-        process.removeListener('SIGINT', this.__sigtermHandler);
+        if (this.__sigtermHandler) {
+            process.removeListener('SIGTERM', this.__sigtermHandler);
+            process.removeListener('SIGINT', this.__sigtermHandler);
+        }
     }
 
     //noinspection JSMethodCanBeStatic
@@ -353,11 +355,13 @@ class OkanjoServer {
         this._unregisterShutdownHandler();
 
         // Stop HAPI
-        this.app.log(' !! Attempting graceful web server shutdown...');
-        await this.hapi.stop({
-            timeout: this.config.drainTime || 5000 // 5 seconds to drain off
-        });
-        this.app.log(' !! web server stopped');
+        if (this.hapi) {
+            this.app.log(' !! Attempting graceful web server shutdown...');
+            await this.hapi.stop({
+                timeout: this.config.drainTime || 5000 // 5 seconds to drain off
+            });
+            this.app.log(' !! web server stopped');
+        }
     }
 }
 

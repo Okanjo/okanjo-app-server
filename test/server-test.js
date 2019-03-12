@@ -68,6 +68,19 @@ describe('OkanjoServer', () => {
 
     });
 
+    it('should not throw when stopping an uninitialized server', async () => {
+        const app = new OkanjoApp({});
+        const server = new OkanjoServer(app);
+        await server.stop();
+    });
+
+    it('should not throw when stopping an un-started server', async () => {
+        const app = new OkanjoApp({});
+        const server = new OkanjoServer(app);
+        await server.init();
+        await server.stop();
+    });
+
     it('should be able to start and stop with no config', done => {
 
         const app = new OkanjoApp({});
