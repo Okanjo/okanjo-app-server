@@ -262,7 +262,13 @@ class OkanjoServer {
      * @private
      */
     _registerShutdownHandler() {
-        this.__sigtermHandler = (/*signal*/) => { this.stop(); };
+        this.__sigtermHandler = async (/*signal*/) => {
+            try {
+                await this.stop();
+            } catch (err) {
+                // eat the stop err, it might already be shutting down
+            }
+        };
 
         process.once('SIGTERM', this.__sigtermHandler);
         process.once('SIGINT', this.__sigtermHandler);
