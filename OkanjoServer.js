@@ -168,6 +168,8 @@ class OkanjoServer {
                         throw new Error(`Error: OkanjoServer \`staticPaths\` entry is missing property \`routePrefix\` (index ${index}`);
                     }
 
+                    const options = definition.options || {};
+
                     // Set up the static inert route
                     this.hapi.route({
                         method: 'GET',
@@ -181,7 +183,8 @@ class OkanjoServer {
                         handler: {
                             directory: {
                                 path: definition.path,
-                                listing: this.config.staticListingEnabled
+                                listing: this.config.staticListingEnabled,
+                                ...options
                             }
                         },
                     });

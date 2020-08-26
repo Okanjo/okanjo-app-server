@@ -30,7 +30,7 @@ module.exports = {
         staticHandlerEnabled: true, // Whether to enable static asset serving
         staticPaths: [ // Array of path to route definitions for arbitrary paths
             { path: path.join(__dirname, 'static'), routePrefix: '/' },
-            { path: path.join(__dirname, 'dist'), routePrefix: '/dist' }
+            { path: path.join(__dirname, 'dist'), routePrefix: '/dist', options: { redirectToSlash: true } }
         ],
         staticListingEnabled: false, // Whether to allow directory listings
         staticNpmModules: [ // Array of module names and paths to expose as static paths
