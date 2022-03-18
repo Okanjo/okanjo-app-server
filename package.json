@@ -1,11 +1,11 @@
 {
   "name": "okanjo-app-server",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Server framework using HAPI and friends",
   "main": "OkanjoServer.js",
   "scripts": {
     "clean": "rm -rf .nyc_output coverage",
-    "test": "node_modules/.bin/mocha -R spec test",
+    "test": "node_modules/.bin/mocha -R spec test --exit",
     "cover": "node_modules/.bin/nyc node_modules/mocha/bin/_mocha --exit",
     "lint": "node_modules/.bin/eslint .",
     "report": "npm run cover && npm run lint"
@@ -39,21 +39,21 @@
     "mocha": "^6.0.2",
     "needle": "^2.2.4",
     "nyc": "^13.3.0",
-    "okanjo-app": "^1.0.1",
+    "okanjo-app": "^2.1.0",
     "should": "^13.2.3",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^4.4.1"
   },
   "peerDependencies": {
     "okanjo-app": ">= 1"
   },
   "dependencies": {
-    "async": "^2.6.2",
-    "hapi": "^18.1.0",
-    "inert": "^5.1.2",
+    "async": "^3.2.3",
+    "@hapi/hapi": "^20.2.1",
+    "@hapi/inert": "^6.0.5",
     "lodash.defaults": "^4.2.0",
-    "nunjucks": "^3.2.0",
-    "socket.io": "^2.2.0",
-    "vision": "^5.4.4"
+    "nunjucks": "^3.2.3",
+    "socket.io": "^4.4.1",
+    "@hapi/vision": "^6.1.0"
   },
   "nyc": {
     "reporter": [

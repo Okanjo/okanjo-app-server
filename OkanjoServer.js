@@ -1,6 +1,6 @@
 "use strict";
 
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const FS = require('fs');
 const Path  = require('path');
 const Util = require('util');
@@ -96,7 +96,7 @@ class OkanjoServer {
             }
 
             // Register the Vision module
-            await this.hapi.register(require('vision'));
+            await this.hapi.register(require('@hapi/vision'));
 
             // Get the nunjucks hapi view integration module
             const nunjucksHapi = require('./NunjucksHapi');
@@ -148,7 +148,7 @@ class OkanjoServer {
         if (this.config.staticHandlerEnabled) {
 
             // Register the inert hapi module for static asset handling
-            await this.hapi.register(require('inert'));
+            await this.hapi.register(require('@hapi/inert'));
 
             // Expose arbitrary static paths
             if (this.config.staticPaths) {
@@ -175,14 +175,14 @@ class OkanjoServer {
                         method: 'GET',
                         path: definition.routePrefix + (/\/$/.test(definition.routePrefix) ? '' : '/') + '{param*}',
                         config: {
-                            tags: ["Excluded"] // Exclude from okanjo-server-docs
-                            //    files: {
-                            //        relativeTo: __dirname
-                            //    }
+                            tags: ["Excluded"], // Exclude from okanjo-server-docs
+                            files: {
+                                relativeTo: definition.path
+                            }
                         },
                         handler: {
                             directory: {
-                                path: definition.path,
+                                path: '.',
                                 listing: this.config.staticListingEnabled,
                                 ...options
                             }
@@ -215,14 +215,14 @@ class OkanjoServer {
                     this.hapi.route({
                         method: 'GET',
                         path: '/vendor/' + definition.moduleName + '/{param*}',
-                        //config: {
-                        //    files: {
-                        //        relativeTo: __dirname
-                        //    }
-                        //},
+                        config: {
+                           files: {
+                               relativeTo: Path.join(Path.dirname(require.resolve(definition.moduleName+'/package.json')), definition.path)
+                           }
+                        },
                         handler: {
                             directory: {
-                                path: Path.join(process.cwd(), 'node_modules', definition.moduleName, definition.path),
+                                path: '.',
                                 listing: this.config.staticListingEnabled
                             }
                         }

@@ -663,7 +663,7 @@ describe('OkanjoServer', () => {
                                     should(err).not.be.ok();
                                     res.should.be.an.Object();
                                     res.statusCode.should.be.equal(200);
-                                    res.body.toString('utf8').should.match(/async\.min\.map/);
+                                    res.body.toString('utf8').should.match(/__esModule/); // this could break if the async dep changes
                                     cb();
                                 });
                             },
