@@ -1,6 +1,6 @@
 # Okanjo App Server
 
-[![Build Status](https://travis-ci.org/Okanjo/okanjo-app-server.svg?branch=master)](https://travis-ci.org/Okanjo/okanjo-app-server) [![Coverage Status](https://coveralls.io/repos/github/Okanjo/okanjo-app-server/badge.svg?branch=master)](https://coveralls.io/github/Okanjo/okanjo-app-server?branch=master)
+[![Node.js CI](https://github.com/Okanjo/okanjo-app-server/actions/workflows/node.js.yml/badge.svg)](https://github.com/Okanjo/okanjo-app-server/actions/workflows/node.js.yml) [![Coverage Status](https://coveralls.io/repos/github/Okanjo/okanjo-app-server/badge.svg?branch=master)](https://coveralls.io/github/Okanjo/okanjo-app-server?branch=master)
 
 Configurable web and API server powered by HAPI for the Okanjo App ecosystem.
 
@@ -32,7 +32,16 @@ npm install okanjo-app-server
 
 > Note: requires the [`okanjo-app`](https://github.com/okanjo/okanjo-app) module.
 
-> Note: v2 and on uses Hapi v18+. Use v1 for Hapi 16
+## Breaking Changes
+
+### v3.0.0
+- Updated to Hapi v20
+- Updated Socket.io to v4.4
+- Updated Okanjo-App to v3
+
+### v2.0.0
+- Updated to Hapi v18+
+
 
 ## Example Usage
 
